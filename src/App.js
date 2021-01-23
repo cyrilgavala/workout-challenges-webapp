@@ -3,6 +3,7 @@ import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import RegistrationForm from "./components/RegistrationForm";
 import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard";
+import Redirect from "./components/Redirect";
 
 
 function App() {
@@ -18,6 +19,9 @@ function App() {
         </Route>
         <Route path={"/dashboard"}>
           <Dashboard/>
+        </Route>
+        <Route path={"/"}>
+          <Redirect/>
         </Route>
       </Switch>
     </BrowserRouter>

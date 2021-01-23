@@ -2,7 +2,6 @@
   "name": "workout-challenges-webapp",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/login",
   "dependencies": {
     "axios": "^0.21.1",
     "react": "^17.0.1",

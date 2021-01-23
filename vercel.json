@@ -1,5 +1,0 @@
-{
-  "redirects": [
-    { "source": "/", "destination": "https://workout-challenges-webapp.vercel.app/login" }
-  ]
-}
