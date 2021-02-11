@@ -4,8 +4,9 @@ import {useHistory} from "react-router";
 import image from "../images/login_image.png";
 import axios from "axios"
 import { bake_cookie } from 'sfcookies';
+import Footer from "./Footer";
 
-function LoginForm() {
+export default function LoginForm() {
   const api_url = "https://workout-challenges-api.herokuapp.com/"
   let history = useHistory();
   const [validated, setValidated] = useState(false);
@@ -66,8 +67,7 @@ function LoginForm() {
           Register
         </Button>
       </div>
+      <Footer/>
     </div>
   )
 }
-
-export default LoginForm;

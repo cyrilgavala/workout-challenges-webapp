@@ -5,8 +5,7 @@ import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard";
 import Redirect from "./components/Redirect";
 
-
-function App() {
+export default function App() {
 
   return (
     <BrowserRouter>
@@ -27,5 +26,3 @@ function App() {
     </BrowserRouter>
   )
 }
-
-export default App;
