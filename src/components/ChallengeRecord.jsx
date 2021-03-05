@@ -1,15 +1,12 @@
-import {Card} from "react-bootstrap";
+import {Toast} from "react-bootstrap";
+import dateFormat from 'dateformat';
 
 export default function ChallengeRecord(props) {
 
   return (
-    <Card className={"record-card"} bg={"dark"}>
-      <Card.Body>
-        <Card.Title>{new Date(props.data.date).toLocaleDateString()}</Card.Title>
-        <Card.Text>
-          {props.data.reps} reps
-        </Card.Text>
-      </Card.Body>
-    </Card>
+  <Toast className={"record-card"} bg={"dark"} onClose={props.onClick}>
+    <Toast.Header>{dateFormat(new Date(props.data.date), "yyyy-mm-dd")}</Toast.Header>
+    <Toast.Body>{props.data.reps} reps</Toast.Body>
+  </Toast>
   )
 }

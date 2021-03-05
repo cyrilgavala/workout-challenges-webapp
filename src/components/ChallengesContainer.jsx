@@ -1,27 +1,53 @@
-import {Tab, Tabs} from "react-bootstrap";
-import {useState} from "react";
+import React from "react";
 import ChallengeRecords from "./ChallengeRecords";
+import axios from "axios";
+import {read_cookie} from "sfcookies";
+import {DropdownButton, Dropdown} from "react-bootstrap";
 
-export default function ChallengesContainer() {
-  const [key, setKey] = useState("pullUp2min");
+const api_url = "https://workout-challenges-api.herokuapp.com/";
 
-  return (
-    <div id={"challenges-container"}>
-      <Tabs
-        id="challenges-container-tabs"
-        activeKey={key}
-        onSelect={(k) => setKey(k)}
-      >
-        <Tab eventKey="pullUp2min" title="Max pull-ups in 2 minutes">
-          <ChallengeRecords challengeKey={"pullUp2min"}/>
-        </Tab>
-        <Tab eventKey="pushUp2min" title="Max push-ups in 2 minutes">
-          <ChallengeRecords challengeKey={"pushUp2min"}/>
-        </Tab>
-        <Tab eventKey="sitUp2min" title="Max sit-ups in 2 minutes">
-          <ChallengeRecords challengeKey={"sitUp2min"}/>
-        </Tab>
-      </Tabs>
-    </div>
-  )
+export default class ChallengesContainer extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      records: <div/>
+    }
+  }
+
+  loadPreviousRecords(key) {
+    axios.get(api_url + "record/records", {
+      params: {
+        challengeKey: key,
+        user: read_cookie("username")
+      }, headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      }
+    }).then((res) => {
+      this.setState({records: <ChallengeRecords key={key} challengeKey={key} data={res.data}/>})
+    }).catch(err => {
+      console.error("Unknown error", err)
+    })
+  }
+
+  onClick(event) {
+    this.loadPreviousRecords(event)
+  }
+
+  render() {
+    return (
+      <div id={"challenges-container"}>
+        <div id={"navbar"}>
+          <DropdownButton key={"right"} id={`dropdown-challenges`} drop={"right"} variant="dark"
+                          title={"Select a challenge"} onSelect={e => this.onClick(e)}>
+            <Dropdown.Item eventKey="pullUp2min">Max pull-ups in 2 minutes</Dropdown.Item>
+            <Dropdown.Item eventKey="pushUp2min">Max push-ups in 2 minutes</Dropdown.Item>
+            <Dropdown.Item eventKey="sitUp2min">Max sit-ups in 2 minutes</Dropdown.Item>
+          </DropdownButton>
+        </div>
+        {this.state.records}
+      </div>
+    )
+  }
 }

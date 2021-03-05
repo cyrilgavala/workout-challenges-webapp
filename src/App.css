@@ -1,3 +1,7 @@
+#root {
+    font-family: Rockwell, serif;
+}
+
 .App {
     text-align: center;
     justify-content: center;
@@ -8,7 +12,6 @@
     left: 0;
     min-width: 100vw;
     min-height: 100vh;
-    font-family: Copperplate, serif;
 }
 
 .App > h4 {
@@ -35,7 +38,6 @@
 }
 
 #dashboard {
-    font-family: Copperplate, serif;
     background-color: #2f3232;
 }
 
@@ -73,33 +75,50 @@
 }
 
 #challenge-records-container {
-    display: inline-block;
+    display: grid;
     width: 100%;
-    margin-bottom: 30px;
+    margin: 30px 0;
 }
 
-.nav {
-    display: block !important;
+#challenges-records {
+    width: 100%;
 }
 
-.nav-tabs {
-    border-bottom: #ffa500 1px solid !important;
+.navItem {
+    background-color: #2f3232;
+    color: #ffa500;
+    border: #ffa500 1px solid;
+    width: 300px;
+    text-align: center;
+    cursor: pointer;
 }
 
-.nav-item {
-    background-color: #2f3232 !important;
-    color: #ffa500 !important;
-    border: #ffa500 1px solid !important;
-}
-
-.active {
-    background-color: #ffa500 !important;
-    color: #2f3232 !important;
+#navbar {
+    width: 100%;
+    display: inline-flex;
 }
 
 #add-record-wrapper {
-    width: 260px;
-    margin: 20px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+#addRecordForm {
+    display: inline-flex;
+    width: 100%;
+}
+
+#addRecordForm > .form-control {
+    width: 150px !important;
+    margin-right: 20px;
+    padding: 0 10px;
+    height: 30px;
+}
+
+#add-record-btn {
+    width: 150px;
+    height: 30px;
+    margin-left: 20px;
 }
 
 .record-card {
@@ -113,6 +132,35 @@
     border: #ffa500 1px solid;
 }
 
+.close {
+    float: right;
+    position: relative;
+    left: 47px;
+}
+
+.chart-wrapper {
+    margin-top: 2em;
+    color: #fff;
+    margin-bottom: 1em;
+    padding-bottom: 3em;
+    background-color: #333;
+    text-align: center;
+    border-radius: 15px;
+    border: 2px solid #fff;
+    font-weight: lighter;
+    height: 500px;
+    width: 100%;
+}
+
+.chart-wrapper > h3 {
+    margin-top: 10px;
+}
+
+.recharts-default-tooltip {
+    background-color: #222 !important;
+    text-align: left !important;
+}
+
 #footer {
     text-align: center;
     justify-content: center;
@@ -122,5 +170,4 @@
     background: #ffa500;
     width: 100vw;
     position: fixed;
-    font-family: Copperplate, serif;
 }
