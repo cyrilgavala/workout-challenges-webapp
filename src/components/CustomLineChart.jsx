@@ -8,14 +8,13 @@ export default class CustomLineChart extends React.Component {
       const lines = this.props.labels.map(i => {
         return <Line key={i.label} type="monotone" dataKey={i.label} strokeWidth={3} stroke={i.color} yAxisId={0}/>
       })
-      return <div className={"chart-wrapper"}>
-        <h3 className={"chart-title"}>Challenge progress</h3>
+      return <div className={"chart-wrapper " + this.props.visible}>
         <ResponsiveContainer>
           <LineChart
             width={window.innerWidth - 100}
             height={400}
             data={this.props.data}
-            margin={{top: 10, right: 50, left: 20, bottom: 0}}
+            margin={{top: 50, right: 50, left: 20, bottom: 0}}
           >
             <XAxis dataKey={"date"} tick={{fill: 'white'}} tickFormatter={o => new Date(o).toLocaleDateString()}/>
             <YAxis yAxisId={0} tick={{fill: 'white'}} allowDataOverflow/>

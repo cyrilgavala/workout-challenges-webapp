@@ -6,6 +6,7 @@ import {read_cookie} from "sfcookies";
 import ChallengeRecord from "./ChallengeRecord";
 import axios from "axios";
 import CustomLineChart from "./CustomLineChart";
+import {v4 as uuidv4} from 'uuid';
 
 const api_url = "https://workout-challenges-api.herokuapp.com/";
 const labels = {
@@ -22,7 +23,9 @@ export default class ChallengeRecords extends React.Component {
       validated: false,
       reps: 0,
       date: new Date(),
-      records: props.data
+      records: props.data,
+      chartKey: uuidv4(),
+      visible: true
     }
   }
 
@@ -35,11 +38,21 @@ export default class ChallengeRecords extends React.Component {
     this.setState({reps: event.target.value})
   }
 
+  recordPresent(date) {
+    let rec = this.state.records.filter(r => r.date === new Date(date).toISOString())
+    console.log(rec)
+    return rec.length > 0
+  }
+
   handleSubmit(event) {
     const form = event.currentTarget;
     event.preventDefault();
     if (form.checkValidity() === false) {
       event.stopPropagation();
+    } else if (this.recordPresent(event.target[1].value)) {
+      form.reset()
+      event.stopPropagation()
+      window.alert("Record for this date already submitted")
     } else {
       form.reset()
       let previousRecords = this.state.records
@@ -65,7 +78,7 @@ export default class ChallengeRecords extends React.Component {
       previousRecords.sort((a, b) => {
         return new Date(a.date) > new Date(b.date) ? -1 : 1;
       });
-      this.setState({validated: true, date: new Date(), reps: 0, records: previousRecords})
+      this.setState({validated: true, date: new Date(), reps: 0, records: previousRecords, chartKey: uuidv4()})
     }
   }
 
@@ -90,7 +103,10 @@ export default class ChallengeRecords extends React.Component {
       }
     }
     this.state.records.splice(indexToRemove, 1);
-    this.setState({records: this.state.records})
+    this.state.records.sort((a, b) => {
+      return new Date(a.date) > new Date(b.date) ? -1 : 1;
+    });
+    this.setState({records: this.state.records, chartKey: uuidv4()})
   }
 
   renderRecords() {
@@ -107,7 +123,6 @@ export default class ChallengeRecords extends React.Component {
   }
 
   render() {
-    console.log(this.state.records)
     return (
       <div id={"challenge-records-container"}>
         <h3>Records for "{labels[this.props.challengeKey]}" challenge</h3>
@@ -126,7 +141,9 @@ export default class ChallengeRecords extends React.Component {
         <div id={"challenges-records"}>
           {this.renderRecords()}
         </div>
-        <CustomLineChart data={this.reorder(this.state.records)} labels={[{label: "reps", color: "orange"}]}/>
+        <h3 className={"chart-title"}>Challenge progress</h3>
+        <CustomLineChart key={this.state.chartKey} data={this.reorder(this.state.records)}
+                         labels={[{label: "reps", color: "orange"}]}/>
       </div>
     )
   }

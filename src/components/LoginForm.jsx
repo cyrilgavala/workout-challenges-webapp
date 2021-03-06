@@ -10,13 +10,16 @@ export default function LoginForm() {
   const api_url = "https://workout-challenges-api.herokuapp.com/"
   let history = useHistory();
   const [validated, setValidated] = useState(false);
+  const [logging, isLogging] = useState(false)
 
   async function handleSubmit(event) {
     const form = event.currentTarget;
     event.preventDefault();
     if (form.checkValidity() === false) {
+      setValidated(false)
       event.stopPropagation();
     } else {
+      isLogging(true)
       setValidated(true);
       await axios.post(api_url + "user/login", {
         name: event.target[0].value,
@@ -33,6 +36,7 @@ export default function LoginForm() {
         }
       }).catch(err => {
         form.reset()
+        isLogging(false)
         if (err.message.includes("409")) window.alert("Wrong password")
         else if (err.message.includes("500")) window.alert("Unknown error")
       })
@@ -55,8 +59,8 @@ export default function LoginForm() {
           <Form.Group controlId="loginPass">
             <Form.Control required type="password" placeholder="Password"/>
           </Form.Group>
-          <Button id={"loginButton"} variant="outline-light" size={"lg"} type="submit">
-            Log in
+          <Button id={"loginButton"} variant="outline-light" size={"lg"} type="submit" disabled={logging}>
+            {logging ? "Logging in..." : "Log in"}
           </Button>
         </Form>
       </div>
