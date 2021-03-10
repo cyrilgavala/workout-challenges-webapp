@@ -1,6 +1,5 @@
 import {delete_cookie, read_cookie} from "sfcookies";
 import {Button} from "react-bootstrap";
-import React from "react";
 import {useHistory} from "react-router";
 
 export default function DashboardHeader() {

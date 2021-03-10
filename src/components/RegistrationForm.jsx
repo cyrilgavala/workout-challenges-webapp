@@ -1,5 +1,5 @@
 import {Button, Form} from "react-bootstrap";
-import React, {useState} from "react";
+import {useState} from "react";
 import {useHistory} from "react-router"
 import image from "../images/login_image.png";
 import axios from "axios";

@@ -2,7 +2,7 @@ import './App.css';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import RegistrationForm from "./components/RegistrationForm";
 import LoginForm from "./components/LoginForm";
-import Dashboard from "./components/Dashboard";
+import Dashboard from "./containers/Dashboard";
 import Redirect from "./components/Redirect";
 
 export default function App() {
