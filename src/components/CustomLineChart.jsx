@@ -1,4 +1,4 @@
-import {CartesianGrid, Line, LineChart, Tooltip, Legend, XAxis, YAxis, ResponsiveContainer} from 'recharts';
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 
 export default function CustomLineChart(props) {
 
@@ -24,6 +24,6 @@ export default function CustomLineChart(props) {
       </ResponsiveContainer>
     </div>
   } else {
-    return <div className={"loading-wrapper"}>No data</div>
+    return <div className={"no-data"}>No data</div>
   }
 }
