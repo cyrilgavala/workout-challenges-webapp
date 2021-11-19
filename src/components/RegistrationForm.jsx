@@ -41,10 +41,10 @@ export default function RegistrationForm() {
             <form id={"registration-form"} noValidate onSubmit={handleSubmit}>
                 <input className={"form-input"} required type="text" placeholder="Enter username"/>
                 <input className={"form-input"} required type="password" placeholder="Password"/>
+                <button id={"registration-btn"} type="submit">{registering ? "Loading..." : "Register"}</button>
                 <p className="input-description">
                     We'll never share your personal information with anyone else.
                 </p>
-                <button id={"registration-btn"} type="submit">{registering ? "Loading..." : "Register"}</button>
             </form>
         </div>
     )
