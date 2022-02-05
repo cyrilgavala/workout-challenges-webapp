@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {read_cookie} from "sfcookies";
 import ChallengeRecord from "../components/ChallengeRecord";
 import axios from "axios";
 import CustomLineChart from "../components/CustomLineChart";
@@ -26,7 +25,7 @@ export default function ChallengeContainer(props) {
             const response = await axios.get(api_url + "record/records", {
                 params: {
                     challengeKey: props.challengeKey,
-                    user: read_cookie("username")
+                    user: props.user
                 }, headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -37,7 +36,7 @@ export default function ChallengeContainer(props) {
             setRecords(response.data)
         }
         loadRecords().then()
-    }, [api_url, props.challengeKey])
+    }, [api_url, props.challengeKey, props.user])
 
     const onDateChange = (event) => {
         event.preventDefault()
@@ -70,7 +69,7 @@ export default function ChallengeContainer(props) {
                 reps: parseInt(event.target[0].value),
                 date: new Date(event.target[1].value).toISOString(),
                 challengeKey: props.challengeKey,
-                user: read_cookie("username")
+                user: props.user
             }
             previousRecords.push(record)
             axios.put(api_url + "record/add-record", record, {
@@ -95,14 +94,13 @@ export default function ChallengeContainer(props) {
 
     const onRecordRemove = (event) => {
         event.preventDefault();
-        console.log(event.target.textContent)
-        const current = new Date(event.target.textContent.substring(0, 10)).toISOString();
+        const current = new Date(event.target.id).toISOString();
         axios.delete(api_url + "record/delete-record", {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             }, data: {
-                user: read_cookie("username"),
+                user: props.user,
                 challengeKey: props.challengeKey,
                 date: current
             }
@@ -125,6 +123,8 @@ export default function ChallengeContainer(props) {
                                                                         onClick={e => onRecordRemove(e)}/>)
     }
 
+    console.log(records)
+
     return (
         <div className={"challenge-container"}>
             <h3>Records for "{labels[props.challengeKey]}" challenge</h3>
@@ -138,7 +138,7 @@ export default function ChallengeContainer(props) {
             <div className={"records-wrapper"}>
                 {renderRecords()}
             </div>
-            <CustomLineChart key={graphKey} data={records} labels={[{label: "reps", color: "orange"}]}/>
+            <CustomLineChart key={graphKey} data={records} labels={[{label: "reps", color: "#1bbce0"}]}/>
         </div>
     )
 

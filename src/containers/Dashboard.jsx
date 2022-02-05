@@ -1,22 +1,30 @@
-import {delete_cookie, read_cookie} from "sfcookies";
 import ChallengeContainer from "./ChallengeContainer";
+import {useState} from "react";
 
-export default function Dashboard() {
+export default function Dashboard(props) {
+
+    const keys = ["pushUp2min", "pullUp2min", "sitUp2min"]
+    const [current, setCurrent] = useState(0)
 
     const logOut = () => {
-        delete_cookie("username")
-        window.location.reload()
+        props.logout()
     }
 
     return (
         <div id={"dashboard"}>
             <div id={"dashboard-header"}>
-                <div>Welcome {read_cookie("username").toUpperCase()}</div>
-                <button id={"logout-btn"} onClick={logOut}>Log out</button>
+                <div>Welcome {props.user.toUpperCase()}</div>
+                <button id={"logout-btn"} onClick={logOut}><span>Log out</span></button>
             </div>
-            <ChallengeContainer challengeKey={"pushUp2min"}/>
-            <ChallengeContainer challengeKey={"pullUp2min"}/>
-            <ChallengeContainer challengeKey={"sitUp2min"}/>
+            <div id={"challenge-content"}>
+                <button id={"previous-btn"} onClick={() => setCurrent((current + 1) % keys.length)}>
+                    <span>&#8678;</span>
+                </button>
+                <ChallengeContainer challengeKey={keys[current]} user={props.user}/>
+                <button id={"next-btn"} onClick={() => setCurrent((current + keys.length - 1) % keys.length)}>
+                    <span>&#8680;</span>
+                </button>
+            </div>
         </div>
     )
 }

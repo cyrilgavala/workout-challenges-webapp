@@ -1,50 +1,41 @@
-import {useState} from "react";
-import axios from "axios"
-import {bake_cookie} from "sfcookies";
+import {useForm} from "react-hook-form";
+import {yupResolver} from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
-export default function LoginForm() {
-    const api_url = process.env.REACT_APP_API_URL
-    const [logging, isLogging] = useState(false)
+export default function LoginForm(props) {
+    const validationSchema = Yup.object().shape({
+        username: Yup.string()
+            .required('Username is required'),
+        password: Yup.string()
+            .required('Password is required')
 
-    async function handleSubmit(event) {
-        const form = event.currentTarget;
-        event.preventDefault();
-        if (form.checkValidity() === false) {
-            event.stopPropagation();
-        } else {
-            isLogging(true)
-            await axios.post(api_url + "user/login", {
-                name: event.target[0].value,
-                pass: Buffer.from(event.target[1].value).toString('base64')
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                }
-            }).then((res) => {
-                if (res.status === 200) {
-                    bake_cookie("username", res.data.name)
-                    window.location.reload()
-                }
-            }).catch(err => {
-                if (err.message.includes("409")) window.alert("Wrong password")
-                else if (err.message.includes("500")) window.alert("Unknown error")
-            })
-            form.reset()
-            isLogging(false)
-        }
+    });
+
+    const formOptions = {resolver: yupResolver(validationSchema)};
+    const {register, handleSubmit, reset, formState: {errors}} = useForm(formOptions)
+
+    const onSubmit = async data => {
+        props.login(data)
+        reset()
     }
 
     return (
-        <div id="login-wrapper">
-            <h4>Login</h4>
-            <form id={"login-form"} noValidate onSubmit={handleSubmit}>
-                <input className={"form-input"} required type="text" placeholder="Enter username"/>
-                <input className={"form-input"} required type="password" placeholder="Password"/>
-                <button id={"login-btn"} type="submit" disabled={logging}>
-                    {logging ? "Logging in..." : "Log in"}
-                </button>
-            </form>
-        </div>
+        <form id={"login-form"} noValidate onSubmit={handleSubmit(onSubmit)}>
+            <div className={"input-wrapper"}>
+                <label className={"input-label"} htmlFor={"log-username"}>Username</label>
+                <input className={`form-input ${errors.username ? 'invalid' : ''}`} disabled={props.loading}
+                       id={"log-username"} type="text" {...register("username")}/>
+                <div className={"validation"}>{errors.username?.message}</div>
+            </div>
+            <div className={"input-wrapper"}>
+                <label className={"input-label"} htmlFor={"log-password"}>Password</label>
+                <input className={`form-input ${errors.password ? 'invalid' : ''}`} disabled={props.loading}
+                       id={"log-password"} type="password" {...register("password")}/>
+                <div className={"validation"}>{errors.password?.message}</div>
+            </div>
+            <button id={"login-btn"} disabled={props.loading} type="submit">
+                <span>{props.loading ? "Logging in..." : "Log in"}</span>
+            </button>
+        </form>
     )
 }

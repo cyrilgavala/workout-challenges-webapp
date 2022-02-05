@@ -9,10 +9,10 @@ export default function CustomLineChart(props) {
     return <div className={"chart-wrapper"}>
       <ResponsiveContainer>
         <LineChart
-          width={window.innerWidth - 100}
-          height={400}
-          data={props.data}
-          margin={{top: 20, right: 50, left: 20, bottom: 10}}
+            width={window.innerWidth}
+            height={400}
+            data={props.data}
+            margin={{top: 20, right: 50, left: 0, bottom: 10}}
         >
           <XAxis dataKey={"date"} tick={{fill: 'white'}} tickFormatter={o => new Date(o).toLocaleDateString()}/>
           <YAxis yAxisId={0} tick={{fill: 'white'}}/>

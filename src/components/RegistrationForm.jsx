@@ -1,51 +1,54 @@
-import axios from "axios";
-import {useState} from "react";
-import {bake_cookie} from "sfcookies";
+import {useForm} from "react-hook-form";
+import {yupResolver} from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
-export default function RegistrationForm() {
-    const api_url = process.env.REACT_APP_API_URL
-    const [registering, isRegistering] = useState(false)
+export default function RegistrationForm(props) {
+    const validationSchema = Yup.object().shape({
+        username: Yup.string()
+            .required('Username is required'),
+        password: Yup.string()
+            .required('Password is required')
+            .min(6, 'Password must be at least 6 characters'),
+        confirmPassword: Yup.string()
+            .required('Confirm Password is required')
+            .oneOf([Yup.ref('password')], 'Passwords must match')
 
-    async function handleSubmit(event) {
-        const form = event.currentTarget;
-        event.preventDefault();
-        if (form.checkValidity() === false) {
-            event.stopPropagation();
-        } else {
-            isRegistering(true)
-            await axios.put(api_url + "user/register", {
-                name: event.target[0].value,
-                pass: Buffer.from(event.target[1].value).toString('base64')
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                }
-            }).then((res) => {
-                if (res.status === 200) {
-                    bake_cookie("username", res.data.name)
-                    window.location.reload()
-                }
-            }).catch(err => {
-                if (err.message.includes("409")) window.alert("Username already exists")
-                else window.alert("Unknown error")
-            })
-            form.reset()
-            isRegistering(false)
-        }
+    });
+
+    const formOptions = {resolver: yupResolver(validationSchema)};
+    const {register, handleSubmit, reset, formState: {errors}} = useForm(formOptions)
+
+    const onSubmit = async data => {
+        props.register(data)
+        reset()
     }
 
     return (
-        <div id={"registration-wrapper"}>
-            <h4>Registration</h4>
-            <form id={"registration-form"} noValidate onSubmit={handleSubmit}>
-                <input className={"form-input"} required type="text" placeholder="Enter username"/>
-                <input className={"form-input"} required type="password" placeholder="Password"/>
-                <button id={"registration-btn"} type="submit">{registering ? "Loading..." : "Register"}</button>
-                <p className="input-description">
-                    We'll never share your personal information with anyone else.
-                </p>
-            </form>
-        </div>
+        <form id={"registration-form"} noValidate onSubmit={handleSubmit(onSubmit)}>
+            <div className={"input-wrapper"}>
+                <label className={"input-label"} htmlFor={"reg-username"}>Username</label>
+                <input className={`form-input ${errors.username ? 'invalid' : ''}`} disabled={props.loading}
+                       id={"reg-username"} type="text" {...register("username")}/>
+                <div className={"validation"}>{errors.username?.message}</div>
+            </div>
+            <div className={"input-wrapper"}>
+                <label className={"input-label"} htmlFor={"reg-password"}>Password</label>
+                <input className={`form-input ${errors.password ? 'invalid' : ''}`} disabled={props.loading}
+                       id={"reg-password"} type="password" {...register("password")}/>
+                <div className={"validation"}>{errors.password?.message}</div>
+            </div>
+            <div className={"input-wrapper"}>
+                <label className={"input-label"} htmlFor={"confirm-password"}>Confirm password</label>
+                <input className={`form-input ${errors.confirmPassword ? 'invalid' : ''}`} disabled={props.loading}
+                       id={"confirm-password"} type="password" {...register("confirmPassword")}/>
+                <div className={"validation"}>{errors.confirmPassword?.message}</div>
+            </div>
+            <button id={"registration-btn"} disabled={props.loading} type="submit">
+                <span>{props.loading ? "Loading..." : "Register"}</span>
+            </button>
+            <p className="input-description">
+                We'll never share your personal information with anyone else.
+            </p>
+        </form>
     )
 }
