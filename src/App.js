@@ -8,7 +8,8 @@ import axios from "axios";
 
 export default function App() {
 
-    const [user, setUser] = useState("")
+    const [accessToken, setAccessToken] = useState("")
+    const [username, setUsername] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const [loginActive, setActive] = useState(true)
@@ -26,7 +27,8 @@ export default function App() {
             }
         }).then((res) => {
             if (res.status === 200) {
-                setUser(res.data.name)
+                setAccessToken(res.data.accessToken)
+                setUsername(res.data.name)
             }
         }).catch(err => {
             if (err.message.includes("409")) {
@@ -53,7 +55,8 @@ export default function App() {
             }
         }).then((res) => {
             if (res.status === 200) {
-                setUser(res.data.name)
+                setAccessToken(res.data.accessToken)
+                setUsername(res.data.name)
             }
         }).catch(err => {
             if (err.message.includes("409")) {
@@ -66,10 +69,10 @@ export default function App() {
     }
 
     const logout = () => {
-        setUser("")
+        setAccessToken("")
     }
 
-    if (user.length === 0) {
+    if (accessToken.length === 0) {
         return <div className={"App"}>
             <h3>Welcome in workout challenges</h3>
             <div id={"signInUp-wrapper"}>
@@ -92,7 +95,7 @@ export default function App() {
         </div>
     } else {
         return <div className={"App"}>
-            <Dashboard logout={logout} user={user}/>
+            <Dashboard logout={logout} accessToken={accessToken} username={username}/>
         </div>
     }
 }

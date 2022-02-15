@@ -2,8 +2,9 @@ import {useEffect, useState} from "react";
 import ChallengeRecord from "../components/ChallengeRecord";
 import axios from "axios";
 import CustomLineChart from "../components/CustomLineChart";
-import {v4 as uuidv4} from 'uuid';
-
+import {useForm} from "react-hook-form";
+import {yupResolver} from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 
 const labels = {
     pushUp2min: "Max push-ups in 2 minutes",
@@ -13,132 +14,109 @@ const labels = {
 
 export default function ChallengeContainer(props) {
 
-    const api_url = process.env.REACT_APP_API_URL
+    const api_url = process.env.REACT_APP_API_URL + "record"
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + props.accessToken,
+    }
 
-    const [reps, setReps] = useState(0)
-    const [date, setDate] = useState(new Date())
+    const validationSchema = Yup.object().shape({
+        reps: Yup.number()
+            .required('Reps are required')
+            .positive('Insert valid amount of reps'),
+        date: Yup.date()
+            .required('Date is required')
+
+    });
+
+    const formOptions = {resolver: yupResolver(validationSchema)};
+    const {register, handleSubmit, reset, formState: {errors}} = useForm(formOptions)
     const [records, setRecords] = useState([])
-    const [graphKey, setGraphKey] = useState(uuidv4())
 
     useEffect(() => {
+        reset()
         const loadRecords = async () => {
-            const response = await axios.get(api_url + "record/records", {
+            const response = await axios.get(api_url, {
                 params: {
                     challengeKey: props.challengeKey,
-                    user: props.user
-                }, headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                }
+                }, headers: headers
             }).catch(err => {
                 console.error("Unknown error", err)
             })
             setRecords(response.data)
         }
         loadRecords().then()
-    }, [api_url, props.challengeKey, props.user])
+    }, [api_url, props.challengeKey, props.accessToken, reset])
 
-    const onDateChange = (event) => {
-        event.preventDefault()
-        setDate(event.target.value)
-    }
-
-    const onRepsChange = (event) => {
-        event.preventDefault()
-        setReps(event.target.value)
-    }
-
-    const recordPresent = (date) => {
+    const recordPresent = date => {
         let rec = records && records.filter(r => r.date === new Date(date).toISOString())
         return rec.length > 0
     }
 
-    const handleSubmit = (event) => {
-        const form = event.currentTarget;
-        event.preventDefault();
-        if (form.checkValidity() === false) {
-            event.stopPropagation();
-        } else if (recordPresent(event.target[1].value)) {
-            form.reset()
-            event.stopPropagation()
+    const onSubmit = async data => {
+        const date = new Date(Date.UTC(data.date.getFullYear(), data.date.getMonth(), data.date.getDate()))
+        if (recordPresent(data.date)) {
             window.alert("Record for this date already submitted")
         } else {
-            form.reset()
-            let previousRecords = records
-            let record = {
-                reps: parseInt(event.target[0].value),
-                date: new Date(event.target[1].value).toISOString(),
+            await axios.put(api_url, {
+                reps: data.reps,
+                date: date.toISOString(),
                 challengeKey: props.challengeKey,
-                user: props.user
-            }
-            previousRecords.push(record)
-            axios.put(api_url + "record/add-record", record, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                }
+            }, {
+                headers: headers
             }).then((res) => {
                 if (res.status === 200) {
-                    console.log("Record saved to the database")
+                    let previousRecords = records
+                    previousRecords.push(res.data)
+                    previousRecords.sort((a, b) => new Date(a.date) < new Date(b.date) ? -1 : 1);
+                    setRecords(previousRecords)
                 }
             }).catch(err => {
                 console.error("Unexpected error when saving record - %s", err)
             })
-            previousRecords.sort((a, b) => new Date(a.date) < new Date(b.date) ? -1 : 1);
-            setRecords(previousRecords)
-            setReps(0)
-            setDate(new Date())
-            setGraphKey(uuidv4())
         }
+        reset()
     }
 
-    const onRecordRemove = (event) => {
-        event.preventDefault();
-        const current = new Date(event.target.id).toISOString();
-        axios.delete(api_url + "record/delete-record", {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }, data: {
-                user: props.user,
-                challengeKey: props.challengeKey,
-                date: current
+    const onRecordRemove = (event, id) => {
+        event.preventDefault()
+        axios.delete(api_url, {
+            headers: headers, params: {
+                id: id,
             }
         }).then().catch(err => console.log(err));
-        let indexToRemove = 0
-        for (let i = 0; i < records.length; i++) {
-            if (records[i].date === current) {
-                indexToRemove = i;
-                break;
-            }
-        }
-        records.splice(indexToRemove, 1);
-        records.sort((a, b) => new Date(a.date) < new Date(b.date) ? -1 : 1);
-        setRecords(records)
-        setGraphKey(uuidv4())
+        setRecords(records.filter(item => item["_id"] !== id))
     }
 
     function renderRecords() {
-        return records && records.map((item, index) => <ChallengeRecord key={props.challengeKey + index} data={item}
-                                                                        onClick={e => onRecordRemove(e)}/>)
+        return records && records.map(item => <ChallengeRecord key={item["_id"]} data={item}
+                                                               onClick={e => onRecordRemove(e, item["_id"])}/>)
     }
-
-    console.log(records)
 
     return (
         <div className={"challenge-container"}>
             <h3>Records for "{labels[props.challengeKey]}" challenge</h3>
-            <form className={"add-record-form"} noValidate onSubmit={e => handleSubmit(e)}
-                  onChange={e => e.currentTarget.checkValidity()}>
-                <input required type="number" min={0} placeholder="Enter number of reps" value={reps}
-                       onChange={reps => onRepsChange(reps)}/>
-                <input value={date} type={"date"} placeholder={"Select date"} onChange={date => onDateChange(date)}/>
+            <form className={"add-record-form"} noValidate onSubmit={handleSubmit(onSubmit)}>
+                <div className={"input-wrapper"}>
+                    <label className={"input-label"} htmlFor={"reps"}>Reps</label>
+                    <input className={`form-input ${errors.reps ? 'invalid' : ''}`}
+                           id={"reps"} type="number" {...register("reps")}/>
+                    <div className={"validation"}>{errors.reps?.message}</div>
+                </div>
+                <div className={"input-wrapper"}>
+                    <label className={"input-label"} htmlFor={"date"}>Date</label>
+                    <input className={`form-input ${errors.date ? 'invalid' : ''}`}
+                           id={"date"} type="date" {...register("date")}/>
+                    <div className={"validation"}>{errors.date?.message}</div>
+                </div>
                 <button className={"add-record-btn"} type={"submit"}>Add record</button>
             </form>
             <div className={"records-wrapper"}>
                 {renderRecords()}
             </div>
-            <CustomLineChart key={graphKey} data={records} labels={[{label: "reps", color: "#1bbce0"}]}/>
+            <CustomLineChart key={Math.random().toString().substring(10, 15)} data={records}
+                             labels={[{label: "reps", color: "#1bbce0"}]}/>
         </div>
     )
 

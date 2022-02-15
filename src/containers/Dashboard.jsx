@@ -13,14 +13,14 @@ export default function Dashboard(props) {
     return (
         <div id={"dashboard"}>
             <div id={"dashboard-header"}>
-                <div>Welcome {props.user.toUpperCase()}</div>
+                <div>Welcome {props.username.toUpperCase()}</div>
                 <button id={"logout-btn"} onClick={logOut}><span>Log out</span></button>
             </div>
             <div id={"challenge-content"}>
                 <button id={"previous-btn"} onClick={() => setCurrent((current + 1) % keys.length)}>
                     <span>&#8678;</span>
                 </button>
-                <ChallengeContainer challengeKey={keys[current]} user={props.user}/>
+                <ChallengeContainer challengeKey={keys[current]} accessToken={props.accessToken}/>
                 <button id={"next-btn"} onClick={() => setCurrent((current + keys.length - 1) % keys.length)}>
                     <span>&#8680;</span>
                 </button>

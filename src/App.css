@@ -371,6 +371,7 @@
     background: #2f3232;
     cursor: pointer;
     padding: .5rem 1rem;
+    margin: auto 0;
 }
 
 .add-record-btn:hover {
