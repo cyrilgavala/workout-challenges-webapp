@@ -75,6 +75,7 @@ export default function App() {
 
     const logout = () => {
         setAccessToken("")
+        delete_cookie("access_token")
     }
 
     const onModalClose = () => {
