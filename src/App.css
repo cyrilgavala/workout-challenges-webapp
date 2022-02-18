@@ -35,6 +35,43 @@
     -webkit-text-fill-color: transparent;
 }
 
+.modal-content {
+    padding: 3rem;
+    background: #1f222290;
+    backdrop-filter: blur(2rem);
+}
+
+.modal-content > p {
+    font-size: clamp(.5rem, 1vw + .5rem, 1.2rem);
+    color: #ffffff;
+}
+
+.modal-btn {
+    padding: .5rem 1rem;
+    background: #1f2222;
+    color: #ffffff;
+    border-radius: .5rem;
+    margin-top: 1rem;
+    margin-right: 1rem;
+    cursor: pointer;
+}
+
+#accept {
+    border: #1bbce0 1px solid;
+}
+
+#accept:hover {
+    box-shadow: #1bbce0 0 0 .5rem;
+}
+
+#reject {
+    border: #d2042d 1px solid;
+}
+
+#reject:hover {
+    box-shadow: #d2042d 0 0 .5rem;
+}
+
 /* Login/Registration page*/
 
 #signInUp-wrapper {
@@ -243,15 +280,17 @@
     width: 100%;
     height: 100%;
     background-color: #1f2222;
+    display: flex;
+    flex-direction: column;
 }
 
 #dashboard-header {
-    width: 90%;
+    width: calc(100% - 10rem);
     height: 5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 5%;
+    padding: 0 5rem;
     background: #1f2222;
 }
 
@@ -264,7 +303,7 @@
 }
 
 #logout-btn {
-    margin: 1rem;
+    margin: 1rem 0;
     padding: .5rem 1.5rem;
     border-radius: 10px;
     background: linear-gradient(#1f2222, #1f2222) padding-box,
@@ -291,47 +330,53 @@
 
 #challenge-content {
     width: 100%;
+    height: calc(100% - 10rem);
     display: flex;
     background-size: cover;
     background-blend-mode: darken;
     background: #1b59e0 url("images/background.jpeg");
+    overflow: scroll;
 }
 
 .challenge-container {
     width: calc(100% - 10rem);
-    height: calc(100% - 5rem);
+    height: min-content;
     background: #2f323280;
     backdrop-filter: blur(1rem);
-    margin: 2rem 0;
     padding: 2rem;
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
+    margin-top: 2rem;
 }
 
 .challenge-container > h3 {
+    margin-left: .5rem;
+    margin-bottom: 2rem;
     width: 100%;
     color: #ffffff;
 }
 
 #previous-btn,
 #next-btn {
-    height: 100%;
     width: 5rem;
+    height: max-content;
     position: relative;
     left: 0;
     background: transparent;
     border: none;
-    padding: 25% 0;
     cursor: pointer;
+    display: contents;
 }
 
 #previous-btn > span,
 #next-btn > span {
     color: #fff;
     font-size: 2rem;
-    padding: 1rem;
+    padding: 0 1rem;
     border-radius: 50%;
+    height: min-content;
+    margin: auto 0;
 }
 
 #previous-btn:hover > span,
@@ -341,12 +386,33 @@
     text-shadow: #1bbce0 0 0 2rem, #1bbce0 0 0 .5rem, #1bbce0 0 0 1rem;
 }
 
+#show-add-record-modal-btn {
+    margin: .5rem;
+    padding: 1rem;
+    border-radius: .5rem;
+    color: #ffffff;
+    background: #2f3232;
+    font-size: 3rem;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+#show-add-record-modal-btn:hover {
+    box-shadow: #ffffff 0 0 .5rem;
+}
+
 .add-record-form {
     width: 50%;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
     padding: 1rem 0;
+    margin: auto;
+    top: 5rem;
+    position: relative;
+    background: #aaaaaa30;
+    backdrop-filter: blur(2rem);
+    border-radius: 1rem;
 }
 
 .add-record-form input {
@@ -371,14 +437,15 @@
     background: #2f3232;
     cursor: pointer;
     padding: .5rem 1rem;
-    margin: auto 0;
+    margin: auto;
+    width: fit-content;
 }
 
 .add-record-btn:hover {
     box-shadow: #1bbce0 0 0 10px;
 }
 
-.records-wrapper {
+#records-wrapper {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -407,6 +474,10 @@
     cursor: pointer;
 }
 
+.record-card > .remove-record-btn:hover {
+    background: #d2042d80;
+}
+
 .chart-wrapper {
     width: 80%;
     margin: 2rem auto;
@@ -418,8 +489,11 @@
 }
 
 .recharts-default-tooltip {
-    background-color: #222 !important;
+    background-color: #2f3232 !important;
     text-align: left !important;
+    color: #ffffff;
+    padding: 1rem !important;
+    border-radius: 1rem;
 }
 
 .no-data {

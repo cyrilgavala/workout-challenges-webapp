@@ -3,8 +3,11 @@ import RegistrationForm from "./components/RegistrationForm";
 import LoginForm from "./components/LoginForm";
 import Dashboard from "./containers/Dashboard";
 import Footer from "./components/Footer";
-import {useState} from "react";
-import axios from "axios";
+import Modal from '@mui/material/Modal';
+import {useEffect, useState} from "react";
+import userService from "./service/userService";
+import {bake_cookie, delete_cookie, read_cookie} from "sfcookies";
+import jwt_decode from "jwt-decode";
 
 export default function App() {
 
@@ -13,58 +16,60 @@ export default function App() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const [loginActive, setActive] = useState(true)
+    const [consent, setConsent] = useState(false)
+    const [modalVisible, setModalVisible] = useState(true)
 
-    const login = async (data) => {
+    useEffect(() => {
+        const consentGranted = read_cookie("consent_granted")
+        setModalVisible(consentGranted.length === 0)
+        if (consentGranted === "true") {
+            setConsent(true)
+            const token = read_cookie("access_token")
+            console.log(token)
+            if (token.length > 0) {
+                setAccessToken(token)
+                setUsername(jwt_decode(token).username)
+            }
+        }
+    }, [setAccessToken])
+
+    const handleSuccessfulResponse = res => {
+        if (consent) {
+            bake_cookie("access_token", res.data.accessToken)
+        }
+        setAccessToken(res.data.accessToken)
+        setUsername(res.data.name)
+    }
+
+    const login = data => {
         setLoading(true)
         setError("")
-        await axios.post(process.env.REACT_APP_API_URL + "user/login", {
-            name: data.username,
-            pass: btoa(data.password)
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        }).then((res) => {
-            if (res.status === 200) {
-                setAccessToken(res.data.accessToken)
-                setUsername(res.data.name)
-            }
-        }).catch(err => {
-            if (err.message.includes("409")) {
-                setError("Wrong password")
-            } else if (err.message.includes("404")) {
-                setError("User not found. Please register.")
-            } else {
-                setError("Unknown error")
-            }
-        })
+        userService.loginUser(data)
+            .then((res) => handleSuccessfulResponse(res))
+            .catch(err => {
+                if (err.message.includes("409")) {
+                    setError("Wrong password")
+                } else if (err.message.includes("404")) {
+                    setError("User not found. Please register.")
+                } else {
+                    setError("Unknown error")
+                }
+            })
         setLoading(false)
     }
 
-    const register = async (data) => {
+    const register = data => {
         setLoading(true)
         setError("")
-        await axios.put(process.env.REACT_APP_API_URL + "user/register", {
-            name: data.username,
-            pass: btoa(data.password)
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        }).then((res) => {
-            if (res.status === 200) {
-                setAccessToken(res.data.accessToken)
-                setUsername(res.data.name)
-            }
-        }).catch(err => {
-            if (err.message.includes("409")) {
-                setError("Username already exists")
-            } else {
-                setError("Unknown error")
-            }
-        })
+        userService.registerUser(data)
+            .then((res) => handleSuccessfulResponse(res))
+            .catch(err => {
+                if (err.message.includes("409")) {
+                    setError("Username already exists")
+                } else {
+                    setError("Unknown error")
+                }
+            })
         setLoading(false)
     }
 
@@ -72,8 +77,35 @@ export default function App() {
         setAccessToken("")
     }
 
+    const onModalClose = () => {
+        setModalVisible(false)
+    }
+
+    const acceptCookies = () => {
+        setConsent(true)
+        setModalVisible(false)
+        bake_cookie("consent_granted", "true")
+    }
+
+    const rejectCookies = () => {
+        bake_cookie("consent_granted", "false")
+        delete_cookie("access_token")
+        setConsent(false)
+        setModalVisible(false)
+    }
+
     if (accessToken.length === 0) {
         return <div className={"App"}>
+            <Modal open={!consent && modalVisible} onClose={() => onModalClose()}>
+                <div className={"modal-content"}>
+                    <p>We use Cookies on this site to enhance your experience. Click on “Accept Cookies” to allow this
+                        functionality and agree to the storing of Cookies and related technologies on your device.
+                        Otherwise you click "Reject Cookies". In case you want to change your decision, you need to
+                        delete Cookies on this page a reload it.</p>
+                    <button id={"accept"} className={"modal-btn"} onClick={acceptCookies}>Accept Cookies</button>
+                    <button id={"reject"} className={"modal-btn"} onClick={rejectCookies}>Reject Cookies</button>
+                </div>
+            </Modal>
             <h3>Welcome in workout challenges</h3>
             <div id={"signInUp-wrapper"}>
                 <div id={"login-wrapper"} className={loginActive ? "active" : "inactive"}>
