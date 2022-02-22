@@ -49,8 +49,8 @@ export default function ChallengeContainer(props) {
                 <AddRecordForm challengeKey={props.challengeKey} accessToken={props.accessToken}
                                callback={addRecordCallback}/>
             </Modal>
+            <button id={"show-add-record-modal-btn"} onClick={() => setOpenModal(true)}>+</button>
             <div id={"records-wrapper"}>
-                <button id={"show-add-record-modal-btn"} onClick={() => setOpenModal(true)}>+</button>
                 {renderRecords()}
             </div>
             <CustomLineChart key={Math.random().toString().substring(10, 15)} data={records}

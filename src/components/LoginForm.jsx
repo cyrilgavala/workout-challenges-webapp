@@ -1,6 +1,7 @@
 import {useForm} from "react-hook-form";
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import {useState} from "react";
 
 export default function LoginForm(props) {
     const validationSchema = Yup.object().shape({
@@ -14,9 +15,13 @@ export default function LoginForm(props) {
     const formOptions = {resolver: yupResolver(validationSchema)};
     const {register, handleSubmit, reset, formState: {errors}} = useForm(formOptions)
 
+    const [loading, setLoading] = useState(false)
+
     const onSubmit = async data => {
+        setLoading(true)
         props.login(data)
         reset()
+        setLoading(false)
     }
 
     return (
@@ -33,8 +38,8 @@ export default function LoginForm(props) {
                        id={"log-password"} type="password" {...register("password")}/>
                 <div className={"validation"}>{errors.password?.message}</div>
             </div>
-            <button id={"login-btn"} disabled={props.loading} type="submit">
-                <span>{props.loading ? "Logging in..." : "Log in"}</span>
+            <button id={"login-btn"} disabled={loading} type="submit">
+                <span>{loading ? "Logging in..." : "Log in"}</span>
             </button>
         </form>
     )

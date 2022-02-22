@@ -339,7 +339,7 @@
 }
 
 .challenge-container {
-    width: calc(100% - 10rem);
+    width: calc(100% - 12rem);
     height: min-content;
     background: #2f323280;
     backdrop-filter: blur(1rem);
@@ -388,14 +388,15 @@
 
 #show-add-record-modal-btn {
     margin: .5rem;
-    padding: 1rem;
+    padding: .5rem;
     border-radius: .5rem;
     color: #ffffff;
     background: #2f3232;
-    font-size: 3rem;
+    font-size: 2rem;
     outline: none;
     border: none;
     cursor: pointer;
+    width: 3ch;
 }
 
 #show-add-record-modal-btn:hover {
@@ -448,18 +449,20 @@
 #records-wrapper {
     width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    overflow: scroll;
 }
 
 .record-card {
     margin: .5rem;
     padding: 1rem;
     border-radius: .5rem;
-    display: grid;
-    overflow: hidden;
     background: #2f3232;
     color: #ffffff;
     font-size: .75rem;
+}
+
+.record-card-header {
+    width: 10ch;
 }
 
 .remove-record-btn {

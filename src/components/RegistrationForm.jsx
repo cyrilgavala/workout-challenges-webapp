@@ -1,6 +1,7 @@
 import {useForm} from "react-hook-form";
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
+import {useState} from "react";
 
 export default function RegistrationForm(props) {
     const validationSchema = Yup.object().shape({
@@ -18,9 +19,13 @@ export default function RegistrationForm(props) {
     const formOptions = {resolver: yupResolver(validationSchema)};
     const {register, handleSubmit, reset, formState: {errors}} = useForm(formOptions)
 
+    const [loading, setLoading] = useState(false)
+
     const onSubmit = async data => {
+        setLoading(true)
         props.register(data)
         reset()
+        setLoading(false)
     }
 
     return (
@@ -43,8 +48,8 @@ export default function RegistrationForm(props) {
                        id={"confirm-password"} type="password" {...register("confirmPassword")}/>
                 <div className={"validation"}>{errors.confirmPassword?.message}</div>
             </div>
-            <button id={"registration-btn"} disabled={props.loading} type="submit">
-                <span>{props.loading ? "Loading..." : "Register"}</span>
+            <button id={"registration-btn"} disabled={loading} type="submit">
+                <span>{loading ? "Loading..." : "Register"}</span>
             </button>
             <p className="input-description">
                 We'll never share your personal information with anyone else.

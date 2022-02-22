@@ -14,7 +14,6 @@ export default function App() {
     const [accessToken, setAccessToken] = useState("")
     const [username, setUsername] = useState("")
     const [error, setError] = useState("")
-    const [loading, setLoading] = useState(false)
     const [loginActive, setActive] = useState(true)
     const [consent, setConsent] = useState(false)
     const [modalVisible, setModalVisible] = useState(true)
@@ -42,7 +41,6 @@ export default function App() {
     }
 
     const login = data => {
-        setLoading(true)
         setError("")
         userService.loginUser(data)
             .then((res) => handleSuccessfulResponse(res))
@@ -55,11 +53,9 @@ export default function App() {
                     setError("Unknown error")
                 }
             })
-        setLoading(false)
     }
 
     const register = data => {
-        setLoading(true)
         setError("")
         userService.registerUser(data)
             .then((res) => handleSuccessfulResponse(res))
@@ -70,7 +66,6 @@ export default function App() {
                     setError("Unknown error")
                 }
             })
-        setLoading(false)
     }
 
     const logout = () => {
@@ -111,15 +106,13 @@ export default function App() {
             <div id={"signInUp-wrapper"}>
                 <div id={"login-wrapper"} className={loginActive ? "active" : "inactive"}>
                     <p>Sign up</p>
-                    <LoginForm login={login} loading={loading}/>
-                    <p className={"switch"}>Not a member? <button disabled={loading}
-                                                                  onClick={() => setActive(false)}>Sign in</button></p>
+                    <LoginForm login={login}/>
+                    <p className={"switch"}>Not a member? <button onClick={() => setActive(false)}>Sign in</button></p>
                 </div>
                 <div id={"registration-wrapper"} className={loginActive ? "inactive" : "active"}>
                     <p>Sign in</p>
-                    <RegistrationForm register={register} loading={loading}/>
-                    <p className={"switch"}>Already a member? <button disabled={loading}
-                                                                      onClick={() => setActive(true)}>Sign up</button>
+                    <RegistrationForm register={register}/>
+                    <p className={"switch"}>Already a member? <button onClick={() => setActive(true)}>Sign up</button>
                     </p>
                 </div>
                 {error && <p onClick={() => setError("")}>Error: {error}</p>}
