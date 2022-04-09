@@ -17,6 +17,7 @@ export default function App() {
     const [loginActive, setActive] = useState(true)
     const [consent, setConsent] = useState(false)
     const [modalVisible, setModalVisible] = useState(true)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const consentGranted = read_cookie("consent_granted")
@@ -30,7 +31,7 @@ export default function App() {
                 setUsername(jwt_decode(token).username)
             }
         }
-    }, [setAccessToken])
+    }, [])
 
     const handleSuccessfulResponse = res => {
         if (consent) {
@@ -42,6 +43,7 @@ export default function App() {
 
     const login = data => {
         setError("")
+        setLoading(true)
         userService.loginUser(data)
             .then((res) => handleSuccessfulResponse(res))
             .catch(err => {
@@ -53,10 +55,12 @@ export default function App() {
                     setError("Unknown error")
                 }
             })
+            .finally(() => setLoading(false))
     }
 
     const register = data => {
         setError("")
+        setLoading(true)
         userService.registerUser(data)
             .then((res) => handleSuccessfulResponse(res))
             .catch(err => {
@@ -66,9 +70,11 @@ export default function App() {
                     setError("Unknown error")
                 }
             })
+            .finally(() => setLoading(false))
     }
 
     const logout = () => {
+        setUsername("")
         setAccessToken("")
         delete_cookie("access_token")
     }
@@ -106,12 +112,12 @@ export default function App() {
             <div id={"signInUp-wrapper"}>
                 <div id={"login-wrapper"} className={loginActive ? "active" : "inactive"}>
                     <p>Sign up</p>
-                    <LoginForm login={login}/>
+                    <LoginForm login={login} loading={loading}/>
                     <p className={"switch"}>Not a member? <button onClick={() => setActive(false)}>Sign in</button></p>
                 </div>
                 <div id={"registration-wrapper"} className={loginActive ? "inactive" : "active"}>
                     <p>Sign in</p>
-                    <RegistrationForm register={register}/>
+                    <RegistrationForm register={register} loading={loading}/>
                     <p className={"switch"}>Already a member? <button onClick={() => setActive(true)}>Sign up</button>
                     </p>
                 </div>
